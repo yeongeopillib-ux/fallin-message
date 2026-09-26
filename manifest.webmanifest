@@ -1,0 +1,11 @@
+{
+  "name": "폴인어학원 문자메이커",
+  "short_name": "폴인문자",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F4F7FB",
+  "theme_color": "#17365D",
+  "icons": [
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
