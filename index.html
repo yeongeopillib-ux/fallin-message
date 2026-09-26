@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17365D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="폴인문자">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg">
+<title>폴인어학원 문자메이커</title>
+<style>
+:root{--navy:#17365d;--blue:#2f75b5;--bg:#f4f7fb;--line:#dbe5f0;--muted:#6b7280;--green:#dff4e8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;color:#1f2937;padding-bottom:82px}
+header{position:sticky;top:0;z-index:10;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;padding:16px 18px;box-shadow:0 3px 12px #0002}
+h1{font-size:20px;margin:0}header p{font-size:12px;margin:4px 0 0;opacity:.9}
+main{max-width:900px;margin:auto;padding:14px}.panel{display:none}.panel.active{display:block}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 4px 14px #0f172a0a}
+h2{margin:0 0 12px;color:var(--navy);font-size:18px}.desc{font-size:12px;color:var(--muted);margin:-4px 0 14px}
+.field{margin-bottom:12px}label{display:block;font-size:12px;font-weight:800;margin-bottom:6px}
+input,select,textarea{width:100%;border:1px solid #cbd5e1;border-radius:11px;padding:11px 12px;font:inherit;font-size:14px;background:#fff}
+textarea{min-height:82px;resize:vertical;line-height:1.55}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.preview{white-space:pre-wrap;background:#fafcff;border:1px solid var(--line);border-radius:12px;padding:15px;min-height:260px;line-height:1.7;font-size:14px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.btn{border:0;border-radius:10px;padding:10px 13px;font-weight:800;font-size:13px}
+.primary{background:var(--navy);color:#fff}.green{background:var(--green);color:#166534}.soft{background:#e8eef5;color:#334155}.danger{background:#fde8e7;color:#b42318}
+.item{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px}.name{font-weight:900;color:var(--navy)}.meta{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5}
+.empty{border:1px dashed #cbd5e1;border-radius:12px;padding:20px;text-align:center;font-size:13px;color:var(--muted)}
+.bottom{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #e5e7eb;display:grid;grid-template-columns:repeat(6,1fr);padding:7px 4px max(7px,env(safe-area-inset-bottom));z-index:20}
+.nav{border:0;background:transparent;color:#64748b;font-size:10px;font-weight:800}.nav b{display:block;font-size:18px}.nav.active{color:var(--navy)}
+.note{background:#fff7d6;color:#6d5600;border-radius:10px;padding:10px;font-size:12px;line-height:1.5}
+@media(min-width:760px){.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}.bottom{max-width:900px;left:50%;transform:translateX(-50%);border-radius:18px 18px 0 0}}
+</style>
+</head>
+<body>
+<header><h1>폴인어학원 문자메이커</h1><p>학생 선택 → 내용 입력 → 문자 자동완성 → 보내기</p></header>
+<main>
+
+<section id="report" class="panel active"><div class="grid">
+<div class="card"><h2>📘 수업 리포트</h2><div class="desc">학생을 고르면 학부모 번호가 자동으로 들어갑니다.</div>
+<div class="field"><label>학생 선택</label><select id="rStudent"></select></div>
+<div class="row"><div class="field"><label>수업일</label><input id="rDate" type="date"></div><div class="field"><label>수업 태도</label><select id="rAtt"><option value="">선택 안 함</option><option>매우 좋음</option><option>좋음</option><option>보통</option><option>집중 필요</option></select></div></div>
+<div class="field"><label>오늘 진도</label><textarea id="rProg" placeholder="예: 공통영어2 Lesson 2 본문 / 관계사 어법"></textarea></div>
+<div class="field"><label>테스트 / 결과</label><input id="rTest" placeholder="예: 단어시험 18/20"></div>
+<div class="field"><label>과제</label><textarea id="rHw" placeholder="예: Workbook p.12~15 / Day 7 단어 암기"></textarea></div>
+<div class="field"><label>선생님 코멘트</label><textarea id="rCom" placeholder="선택 입력"></textarea></div></div>
+<div class="card"><h2>완성 문자</h2><div class="field"><label>받는 번호</label><input id="rPhone" inputmode="tel"></div><div id="rOut" class="preview"></div><div class="actions"><button class="btn primary" onclick="copyOut('rOut')">복사</button><button class="btn green" onclick="sendSms('rOut','rPhone','수업 리포트','rStudent')">문자 보내기</button></div></div>
+</div></section>
+
+<section id="notice" class="panel"><div class="grid">
+<div class="card"><h2>📢 공지</h2><div class="field"><label>학생 선택</label><select id="nStudent"></select></div><div class="field"><label>공지 제목</label><input id="nTitle" placeholder="예: 추석 연휴 수업 안내"></div><div class="field"><label>핵심 내용</label><textarea id="nBody"></textarea></div><div class="field"><label>추가 안내</label><textarea id="nExtra"></textarea></div></div>
+<div class="card"><h2>완성 문자</h2><div class="field"><label>받는 번호</label><input id="nPhone" inputmode="tel"></div><div id="nOut" class="preview"></div><div class="actions"><button class="btn primary" onclick="copyOut('nOut')">복사</button><button class="btn green" onclick="sendSms('nOut','nPhone','공지','nStudent')">문자 보내기</button></div></div>
+</div></section>
+
+<section id="makeup" class="panel"><div class="grid">
+<div class="card"><h2>🗓️ 보강 안내</h2><div class="field"><label>학생 선택</label><select id="mStudent"></select></div><div class="field"><label>보강 사유</label><input id="mReason"></div><div class="row"><div class="field"><label>날짜</label><input id="mDate" type="date"></div><div class="field"><label>시간</label><input id="mTime" placeholder="오후 6:00~7:30"></div></div><div class="field"><label>수업 내용</label><textarea id="mBody"></textarea></div><div class="field"><label>준비물 / 과제</label><input id="mPrep"></div></div>
+<div class="card"><h2>완성 문자</h2><div class="field"><label>받는 번호</label><input id="mPhone" inputmode="tel"></div><div id="mOut" class="preview"></div><div class="actions"><button class="btn primary" onclick="copyOut('mOut')">복사</button><button class="btn green" onclick="sendSms('mOut','mPhone','보강 안내','mStudent')">문자 보내기</button></div></div>
+</div></section>
+
+<section id="absence" class="panel"><div class="grid">
+<div class="card"><h2>⚠️ 결석 · 과제 안내</h2><div class="field"><label>학생 선택</label><select id="aStudent"></select></div><div class="field"><label>안내 유형</label><select id="aType"><option>과제 미제출</option><option>결석</option><option>지각</option><option>복습 부족</option><option>집중력 저하</option></select></div><div class="field"><label>상세 내용</label><textarea id="aBody"></textarea></div><div class="field"><label>후속 조치</label><textarea id="aAct"></textarea></div></div>
+<div class="card"><h2>완성 문자</h2><div class="field"><label>받는 번호</label><input id="aPhone" inputmode="tel"></div><div id="aOut" class="preview"></div><div class="actions"><button class="btn primary" onclick="copyOut('aOut')">복사</button><button class="btn green" onclick="sendSms('aOut','aPhone','결석·과제 안내','aStudent')">문자 보내기</button></div></div>
+</div></section>
+
+<section id="students" class="panel">
+<div class="card"><h2>👥 학생 주소록</h2><div class="desc">한 번 저장하면 모든 탭에서 학생 이름만 선택해 번호를 불러옵니다.</div>
+<div class="row"><div class="field"><label>학생명</label><input id="cName"></div><div class="field"><label>반</label><input id="cClass"></div></div>
+<div class="field"><label>학부모 전화번호</label><input id="cPhone" inputmode="tel"></div><div class="field"><label>메모</label><input id="cMemo"></div><button class="btn primary" onclick="addContact()">학생 저장</button></div>
+<div class="card"><div class="field"><input id="cSearch" placeholder="학생 이름 또는 반 검색"></div><div id="cList"></div></div>
+</section>
+
+<section id="more" class="panel">
+<div class="card"><h2>🕘 최근 발송 기록</h2><div class="actions"><button class="btn soft" onclick="backup()">데이터 백업</button><button class="btn danger" onclick="clearHist()">기록 삭제</button></div><div id="hList" style="margin-top:12px"></div></div>
+<div class="card"><h2>⚙️ 기본 설정</h2><div class="field"><label>학원명</label><input id="sAcademy"></div><div class="field"><label>문의 전화</label><input id="sPhone"></div><div class="field"><label>기본 인사말</label><input id="sGreeting"></div><div class="field"><label>기본 마무리</label><input id="sClosing"></div><button class="btn green" onclick="saveSettings()">설정 저장</button><div class="note" style="margin-top:12px">학생 주소록과 기록은 현재 휴대폰 브라우저에 저장됩니다. 중요한 자료는 가끔 백업해 주세요.</div></div>
+</section>
+
+</main>
+<nav class="bottom">
+<button class="nav active" data-tab="report"><b>📘</b>리포트</button><button class="nav" data-tab="notice"><b>📢</b>공지</button><button class="nav" data-tab="makeup"><b>🗓️</b>보강</button><button class="nav" data-tab="absence"><b>⚠️</b>결석·과제</button><button class="nav" data-tab="students"><b>👥</b>학생</button><button class="nav" data-tab="more"><b>⚙️</b>기록·설정</button>
+</nav>
+<script>
+const K="fallinMsgV3";
+let D=JSON.parse(localStorage.getItem(K)||"null")||{settings:{academy:"폴인어학원",phone:"043-291-0901",greeting:"안녕하세요. 폴인어학원입니다. 😊",closing:"궁금하신 점은 언제든 편하게 연락 주세요."},contacts:[],history:[]};
+const $=id=>document.getElementById(id),V=id=>($(id)?.value||"").trim();
+function save(){localStorage.setItem(K,JSON.stringify(D))}
+function dateK(x){if(!x)return"";const d=new Date(x+"T00:00:00"),w=["일","월","화","수","목","금","토"];return `${d.getMonth()+1}월 ${d.getDate()}일(${w[d.getDay()]})`}
+function contact(id){return D.contacts.find(c=>c.id===V(id))||null}
+function nameOf(id){const c=contact(id);return c?c.name:""}
+function opts(){let a='<option value="">학생 선택 안 함</option>';D.contacts.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(c=>a+=`<option value="${c.id}">${c.name}${c.className?" · "+c.className:""}</option>`);["rStudent","nStudent","mStudent","aStudent"].forEach(id=>{const old=$(id).value;$(id).innerHTML=a;if([...$(id).options].some(o=>o.value===old))$(id).value=old})}
+function att(x){return{"매우 좋음":"오늘 수업에 매우 집중해서 적극적으로 참여했습니다.","좋음":"오늘 수업에 집중해서 성실하게 참여했습니다.","보통":"전반적으로 수업에 잘 참여했으며, 부족한 부분은 계속 점검하겠습니다.","집중 필요":"오늘은 다소 집중력이 흔들리는 부분이 있어 다음 수업에서 더욱 세심하게 지도하겠습니다."}[x]||""}
+function render(){
+const s=D.settings;let n=nameOf("rStudent"),o=s.greeting+"\n\n"+(n?n+" 학생 ":"")+(V("rDate")?dateK(V("rDate"))+" ":"")+"수업 내용 안내드립니다.";
+if(V("rProg"))o+="\n\n📘 오늘의 수업\n• "+V("rProg");
+if(V("rTest")||V("rAtt")){o+="\n\n📝 학습 결과";if(V("rTest"))o+="\n• "+V("rTest");if(V("rAtt"))o+="\n• "+att(V("rAtt"))}
+if(V("rHw"))o+="\n\n🏠 오늘의 과제\n• "+V("rHw");if(V("rCom"))o+="\n\n🔎 선생님 코멘트\n• "+V("rCom");
+o+="\n\n오늘 학습한 내용을 다음 수업에서도 다시 확인하며 꼼꼼히 지도하겠습니다.\n\n"+s.academy;$("rOut").textContent=o;
+n=nameOf("nStudent");o=s.greeting+(n?"\n\n"+n+" 학생 학부모님께 안내드립니다.":"");if(V("nTitle"))o+="\n\n📢 "+V("nTitle");if(V("nBody"))o+="\n\n"+V("nBody");if(V("nExtra"))o+="\n\n※ "+V("nExtra");o+="\n\n"+s.closing+(s.phone?"\n문의: "+s.phone:"")+"\n\n"+s.academy;$("nOut").textContent=o;
+n=nameOf("mStudent");o=s.greeting+"\n\n🗓️ 보강 수업 안내드립니다."+(n?"\n\n대상: "+n+" 학생":"");if(V("mReason"))o+="\n사유: "+V("mReason");if(V("mDate"))o+="\n일정: "+dateK(V("mDate"))+(V("mTime")?" "+V("mTime"):"");if(V("mBody"))o+="\n수업내용: "+V("mBody");if(V("mPrep"))o+="\n준비: "+V("mPrep");o+="\n\n학생이 빠진 부분 없이 잘 따라갈 수 있도록 꼼꼼히 보강하겠습니다.\n\n"+s.academy;$("mOut").textContent=o;
+n=nameOf("aStudent");o=s.greeting+"\n\n"+(n?n+" 학생 ":"")+V("aType")+" 관련하여 안내드립니다.";if(V("aBody"))o+="\n\n"+V("aBody");if(V("aAct"))o+="\n\n"+V("aAct");o+="\n\n학습 흐름이 끊기지 않도록 계속 확인하며 지도하겠습니다.\n\n"+s.academy;$("aOut").textContent=o;
+renderContacts();renderHist()}
+function sync(sid,pid){const c=contact(sid);if(c)$(pid).value=c.phone;render()}
+function addContact(){const n=V("cName"),p=V("cPhone").replace(/\D/g,"");if(!n||!p){alert("학생명과 전화번호를 입력해 주세요.");return}D.contacts.push({id:String(Date.now()),name:n,className:V("cClass"),phone:p,memo:V("cMemo")});save();["cName","cClass","cPhone","cMemo"].forEach(i=>$(i).value="");opts();render()}
+function delContact(id){if(confirm("이 학생을 삭제할까요?")){D.contacts=D.contacts.filter(c=>c.id!==id);save();opts();render()}}
+function renderContacts(){const q=V("cSearch").toLowerCase(),a=D.contacts.filter(c=>(c.name+" "+(c.className||"")+" "+c.phone).toLowerCase().includes(q));$("cList").innerHTML=a.length?a.map(c=>`<div class="item"><div class="name">${c.name}${c.className?" · "+c.className:""}</div><div class="meta">${c.phone}${c.memo?"<br>"+c.memo:""}</div><div class="actions"><button class="btn danger" onclick="delContact('${c.id}')">삭제</button></div></div>`).join(""):'<div class="empty">저장된 학생이 없습니다.</div>'}
+function hist(type,sid,out,pid){D.history.unshift({date:new Date().toLocaleString(),type,name:nameOf(sid)||"미지정",phone:V(pid),body:$(out).textContent});D.history=D.history.slice(0,100);save();renderHist()}
+function renderHist(){$("hList").innerHTML=D.history.length?D.history.map(h=>`<div class="item"><div class="name">${h.name} · ${h.type}</div><div class="meta">${h.date} · ${h.phone}<br>${h.body.slice(0,140)}${h.body.length>140?"…":""}</div></div>`).join(""):'<div class="empty">아직 발송 기록이 없습니다.</div>'}
+async function copyOut(id){try{await navigator.clipboard.writeText($(id).textContent);alert("복사했습니다.")}catch(e){alert("길게 눌러 직접 복사해 주세요.")}}
+function sendSms(out,pid,type,sid){const p=V(pid).replace(/[^0-9+]/g,""),b=$(out).textContent;if(!p){alert("받는 번호를 확인해 주세요.");return}hist(type,sid,out,pid);const sep=/iPad|iPhone|iPod/.test(navigator.userAgent)?"&":"?";location.href="sms:"+p+sep+"body="+encodeURIComponent(b)}
+function saveSettings(){D.settings={academy:V("sAcademy")||"폴인어학원",phone:V("sPhone"),greeting:V("sGreeting")||"안녕하세요. 폴인어학원입니다. 😊",closing:V("sClosing")||"궁금하신 점은 언제든 편하게 연락 주세요."};save();render();alert("저장했습니다.")}
+function loadSettings(){$("sAcademy").value=D.settings.academy;$("sPhone").value=D.settings.phone;$("sGreeting").value=D.settings.greeting;$("sClosing").value=D.settings.closing}
+function clearHist(){if(confirm("발송 기록을 모두 삭제할까요?")){D.history=[];save();renderHist()}}
+function backup(){const b=new Blob([JSON.stringify(D,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="폴인문자_백업.json";a.click()}
+document.querySelectorAll("input,select,textarea").forEach(e=>e.addEventListener("input",render));
+[["rStudent","rPhone"],["nStudent","nPhone"],["mStudent","mPhone"],["aStudent","aPhone"]].forEach(x=>$(x[0]).addEventListener("change",()=>sync(x[0],x[1])));
+document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>{document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(b.dataset.tab).classList.add("active");window.scrollTo(0,0)});
+$("cSearch").addEventListener("input",renderContacts);
+const t=new Date().toISOString().slice(0,10);$("rDate").value=t;$("mDate").value=t;loadSettings();opts();render();
+if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js");
+</script>
+</body></html>
